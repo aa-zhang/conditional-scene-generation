@@ -1,1 +1,2 @@
-# conditional-scene-generation
+# Conditional scene generation
+
