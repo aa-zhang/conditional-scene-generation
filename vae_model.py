@@ -113,7 +113,7 @@ def train(network, inputs, optimizer, criterion):
     optimizer.step()
     return loss
 
-if __name__ = '__main__':
+if __name__ == '__main__':
     train_dataset = NuscData(is_train=True)
     batch_size = 4
     train_loader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=collate_fn)
