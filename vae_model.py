@@ -65,8 +65,8 @@ class VAE(nn.Module):
 
     def forward(self, data):
         ids = data.batch_ids
-        maps = data.batched_map
-        x = data.batched_vehicles
+        maps = data.batched_map.cuda()
+        x = data.batched_vehicles.cuda()
         
         # concatenate global map features
         map_features = self.get_map_features(ids, maps)
@@ -108,7 +108,7 @@ def total_loss(mu, log_var, criterion, output, inputs):
 def train(network, inputs, optimizer, criterion):
     optimizer.zero_grad()
     output, mu, log_var = network(inputs)
-    loss = total_loss(mu, log_var, criterion, output, inputs.batched_vehicles)
+    loss = total_loss(mu, log_var, criterion, output, inputs.batched_vehicles.cuda())
     loss.backward()
     optimizer.step()
     return loss
@@ -116,7 +116,7 @@ def train(network, inputs, optimizer, criterion):
 if __name__ == '__main__':
     train_dataset = NuscData(is_train=True)
     batch_size = 4
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=collate_fn)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=collate_fn, drop_last=True)
     vehicle_dim = 6
     
     network = VAE().cuda()
@@ -130,7 +130,7 @@ if __name__ == '__main__':
         train_epoch_loss = 0
 
         for i, data in enumerate(train_loader, 0):
-            train_epoch_loss += train(network, data.cuda(), optimizer, criterion)
+            train_epoch_loss += train(network, data, optimizer, criterion)
 
         print(f'Train Loss: {train_epoch_loss.item()/i}')
     
